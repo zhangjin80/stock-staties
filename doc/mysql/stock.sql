@@ -1,4 +1,16 @@
 -- 股票爬取数据相关数据表
+DROP TABLE IF EXISTS `stock_rank`;
+CREATE TABLE `stock_rank` (
+`stock_name` varchar(255) NOT NULL,
+`end_date` date DEFAULT NULL,
+`before_week_date` date DEFAULT NULL,
+`end_price` decimal(10,4) DEFAULT NULL,
+`before_price` decimal(10,4) DEFAULT NULL,
+`rate` double(255,6) DEFAULT NULL,
+`back_week` tinyint(1) NOT NULL,
+`rn` int(3) NOT NULL,
+PRIMARY KEY (`stock_name`,`back_week`,`rn`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- k线数据表
 drop table if exists tbl_kline;
