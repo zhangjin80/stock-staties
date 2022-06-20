@@ -40,6 +40,7 @@ public class KlinePipeline implements Pipeline {
         dataList.forEach(kline -> {
             Optional<Kline> optionalKline = selectKlineByCodeAndTradingDate(code, kline.getTradingDate());
             if (!optionalKline.isPresent()) {
+
                 klineMapper.insertSelective(kline);
             }
         });

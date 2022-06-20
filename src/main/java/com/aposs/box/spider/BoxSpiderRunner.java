@@ -1,8 +1,5 @@
 package com.aposs.box.spider;
 
-import com.aposs.box.spider.domain.stock.NewStockSpider;
-import com.aposs.box.spider.domain.stock.StockRealTimeSpider;
-import com.aposs.box.spider.service.SimpleSpiderService;
 import com.aposs.box.spider.service.StockSpiderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,42 +24,11 @@ public class BoxSpiderRunner implements ApplicationRunner {
 
     @Resource
     private StockSpiderService stockSpiderService;
-    @Resource
-    private StockRealTimeSpider stockRealTimeSpider;
-    @Resource
-    private NewStockSpider newStockSpider;
-    @Resource
-    private SimpleSpiderService simpleSpiderService;
-
-
 
     @Override
     public void run(ApplicationArguments args) {
         // 启动程序立刻执行一次爬取程序
-        processNewsSpiderSchedule();
-    }
-
-    /**
-     * 定时执行器，程序启动后立刻执行一次
-     */
-    @Scheduled(cron = "${box.spider.cron}")
-    public void processNewsSpiderSchedule() {
-        logger.info("---------- SpiderSchedule start ----------");
-        simpleSpiderService.runAllSimpleSpider();
-        logger.info("---------- SpiderSchedule finished ----------");
-    }
-
-
-    /**
-     * 每天 10:00 执行
-     */
-    @Scheduled(cron = "0 0 10 1/1 * ?")
-    public void processCheckTradingDateSchedule() {
-        // 检查交易日并记录
-        stockRealTimeSpider.checkAndUpdateTradingDate();
-
-        // 爬取新股
-        newStockSpider.crawNewStockInfo();
+        stockSpiderService.runKlineSpider(10);
     }
 
     /**

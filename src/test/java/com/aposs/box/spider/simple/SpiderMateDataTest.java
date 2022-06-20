@@ -6,7 +6,6 @@ import com.aposs.box.spider.converter.SpiderMateDataConverter;
 import com.aposs.box.spider.dao.SpiderMateDataDao;
 import com.aposs.box.spider.model.dto.SpiderMateDataDto;
 import com.aposs.box.spider.model.entity.SpiderMateData;
-import com.aposs.box.spider.service.SimpleSpiderService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,7 +27,7 @@ public class SpiderMateDataTest {
     private SpiderMateDataDao spiderMateDataDao;
 
     @Resource
-    private SimpleSpiderService simpleSpiderService;
+//    private SimpleSpiderService simpleSpiderService;
 
     @Test
     public void test(){
@@ -40,7 +39,7 @@ public class SpiderMateDataTest {
 
     @Test
     public void simpleSpiderServiceTest(){
-        simpleSpiderService.runAllSimpleSpider();
+//        simpleSpiderService.runAllSimpleSpider();
     }
 
 

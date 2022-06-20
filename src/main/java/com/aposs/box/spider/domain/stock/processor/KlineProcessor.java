@@ -37,6 +37,7 @@ public class KlineProcessor implements PageProcessor {
         String jsonString = pageString.substring(startIndex + 1, endIndex);
         JSONObject pageJson = JSONObject.parseObject(jsonString);
         JSONObject dataJson = pageJson.getJSONObject("data");
+        logger.info("抓取到的数据json:{}",dataJson.toJSONString());
         String code = dataJson.getString("code");
         String name = dataJson.getString("name");
         JSONArray klinesArray = dataJson.getJSONArray("klines");
