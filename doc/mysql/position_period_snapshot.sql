@@ -38,7 +38,7 @@ FROM
 		prev_s_name,
 		prev_s_number,
 		kl.closing_price AS prev_s_cur_price,
-		ifnull(( kl.closing_price * prev_s_number ),initial_value)AS cur_p_value
+		ifnull(ifnull(( kl.closing_price * prev_s_number ),prev_p_value),initial_value) AS cur_p_value
 	FROM
 		(
 		SELECT
@@ -47,6 +47,7 @@ FROM
 			period + 1 AS period,
 			DATE_ADD( SUBDATE( CURDATE( ), WEEKDAY( CURDATE( ) ) ), INTERVAL 4 DAY ) AS cur_period_time,
 			initial_value,
+			cur_p_value as prev_p_value,
 			cur_s_code AS prev_s_code,
 			cur_s_name AS prev_s_name,
 			cur_s_number AS prev_s_number
