@@ -17,9 +17,7 @@ import java.util.Date;
 @Table(name = "tbl_spider_mate_data")
 public class SpiderMateData {
     private Integer id;
-    // 标题，展示用
     private String title;
-    // 说明，展示用
     private String description;
 
 

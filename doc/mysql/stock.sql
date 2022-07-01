@@ -51,21 +51,25 @@ COMMIT;
 DROP TABLE IF EXISTS `stock_rank`;
 CREATE TABLE `stock_rank`
 (
-    `id`         int NOT NULL AUTO_INCREMENT,
-    `s_code`     varchar(255)   DEFAULT NULL COMMENT '股票代码',
-    `s_name`     varchar(255)   DEFAULT NULL COMMENT '股票名',
-    `period`     varchar(255)   DEFAULT NULL COMMENT '持仓周期',
-    `back_week`  tinyint(1)     DEFAULT NULL COMMENT '回测几周',
-    `end_dt`     datetime       DEFAULT NULL COMMENT '当期日期',
-    `prev_dt`    datetime       DEFAULT NULL COMMENT '上期日期',
-    `end_price`  decimal(10, 4) DEFAULT NULL COMMENT '当期价格',
-    `prev_price` decimal(10, 4) DEFAULT NULL COMMENT '上期价格',
-    `rate`       double(255, 6) DEFAULT NULL COMMENT '增长率',
-    `rn`         int            DEFAULT NULL COMMENT '当前排序',
-    PRIMARY KEY (`id`) USING BTREE
+    `id`         int                                                     NOT NULL AUTO_INCREMENT,
+    `s_code`     varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '股票代码',
+    `s_name`     varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '股票名',
+    `period`     varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '持仓周期',
+    `back_week`  tinyint(1)                                              NULL DEFAULT NULL COMMENT '回测几周',
+    `end_dt`     datetime                                                NULL DEFAULT NULL COMMENT '当期日期',
+    `prev_dt`    datetime                                                NULL DEFAULT NULL COMMENT '上期日期',
+    `end_price`  decimal(10, 4)                                          NULL DEFAULT NULL COMMENT '当期价格',
+    `prev_price` decimal(10, 4)                                          NULL DEFAULT NULL COMMENT '上期价格',
+    `rate`       double(10, 4)                                          NULL DEFAULT NULL COMMENT '增长率',
+    `rn`         int                                                     NULL DEFAULT NULL COMMENT '当前排序',
+    PRIMARY KEY (`id`) USING BTREE,
+    UNIQUE INDEX `uk_s_code_back_week_end_dt` (`s_code` ASC, `back_week` ASC, `end_dt` ASC) USING BTREE COMMENT '唯一键索引'
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 12
-  DEFAULT CHARSET = utf8mb3;
+  AUTO_INCREMENT = 1
+  CHARACTER SET = utf8
+  COLLATE = utf8_general_ci
+  ROW_FORMAT = Dynamic;
+
 
 -- ----------------------------
 -- Records of stock_rank
@@ -476,3 +480,9 @@ VALUES (3, '512100', '中证1000ETF', 1, NULL, NULL, NULL, NULL, NULL, '2022-06-
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- ----------------------------
+-- View structure for stock_rank_view
+-- ----------------------------
+DROP VIEW IF EXISTS `stock_rank_view`;
+CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `stock_rank_view` AS select `t`.`s_code` AS `s_code`,`t`.`s_name` AS `s_name`,ifnull((`t2`.`max_period` + 1),0) AS `period`,`t`.`back_week` AS `back_week`,`t`.`end_dt` AS `end_dt`,`t`.`prev_dt` AS `prev_dt`,`t`.`end_price` AS `end_price`,`t`.`prev_price` AS `prev_price`,`t`.`rate` AS `rate`,`t`.`rn` AS `rn` from ((select `t`.`s_name` AS `s_name`,`t`.`s_code` AS `s_code`,`t`.`end_dt` AS `end_dt`,`t`.`prev_dt` AS `prev_dt`,`t`.`end_price` AS `end_price`,`t`.`prev_price` AS `prev_price`,`t`.`rate` AS `rate`,`t`.`back_week` AS `back_week`,row_number() OVER (ORDER BY `t`.`rate` desc )  AS `rn` from (select `t1`.`name` AS `s_name`,`t1`.`code` AS `s_code`,`t1`.`end_dt` AS `end_dt`,`t2`.`prev_dt` AS `prev_dt`,`t1`.`end_price` AS `end_price`,`t2`.`prev_price` AS `prev_price`,((`t1`.`end_price` - `t2`.`prev_price`) / `t1`.`end_price`) AS `rate`,4 AS `back_week` from ((select `tbl_kline`.`name` AS `name`,`tbl_kline`.`code` AS `code`,`tbl_kline`.`trading_date` AS `end_dt`,`tbl_kline`.`closing_price` AS `end_price` from `tbl_kline` where (`tbl_kline`.`trading_date` = (select max(`tbl_kline`.`trading_date`) from `tbl_kline` where ((`tbl_kline`.`trading_date` >= (((curdate() - interval weekday(curdate()) day) - interval 4 week) + interval 4 day)) and (`tbl_kline`.`trading_date` <= curdate()))))) `t1` join (select `tbl_kline`.`name` AS `name`,`tbl_kline`.`code` AS `code`,`tbl_kline`.`trading_date` AS `prev_dt`,`tbl_kline`.`closing_price` AS `prev_price` from `tbl_kline` where (`tbl_kline`.`trading_date` = (select min(`tbl_kline`.`trading_date`) from `tbl_kline` where ((`tbl_kline`.`trading_date` >= (((curdate() - interval weekday(curdate()) day) - interval 4 week) + interval 4 day)) and (`tbl_kline`.`trading_date` <= curdate()))))) `t2` on((`t1`.`name` = `t2`.`name`)))) `t` union all select `t`.`s_name` AS `s_name`,`t`.`s_code` AS `s_code`,`t`.`end_dt` AS `end_dt`,`t`.`prev_dt` AS `prev_dt`,`t`.`end_price` AS `end_price`,`t`.`prev_price` AS `prev_price`,`t`.`rate` AS `rate`,`t`.`back_week` AS `back_week`,row_number() OVER (ORDER BY `t`.`rate` desc )  AS `rn` from (select `t1`.`name` AS `s_name`,`t1`.`code` AS `s_code`,`t1`.`end_dt` AS `end_dt`,`t2`.`prev_dt` AS `prev_dt`,`t1`.`end_price` AS `end_price`,`t2`.`prev_price` AS `prev_price`,((`t1`.`end_price` - `t2`.`prev_price`) / `t1`.`end_price`) AS `rate`,3 AS `back_week` from ((select `tbl_kline`.`name` AS `name`,`tbl_kline`.`code` AS `code`,`tbl_kline`.`trading_date` AS `end_dt`,`tbl_kline`.`closing_price` AS `end_price` from `tbl_kline` where (`tbl_kline`.`trading_date` = (select max(`tbl_kline`.`trading_date`) from `tbl_kline` where ((`tbl_kline`.`trading_date` >= (((curdate() - interval weekday(curdate()) day) - interval 3 week) + interval 4 day)) and (`tbl_kline`.`trading_date` <= curdate()))))) `t1` join (select `tbl_kline`.`name` AS `name`,`tbl_kline`.`code` AS `code`,`tbl_kline`.`trading_date` AS `prev_dt`,`tbl_kline`.`closing_price` AS `prev_price` from `tbl_kline` where (`tbl_kline`.`trading_date` = (select min(`tbl_kline`.`trading_date`) from `tbl_kline` where ((`tbl_kline`.`trading_date` >= (((curdate() - interval weekday(curdate()) day) - interval 3 week) + interval 4 day)) and (`tbl_kline`.`trading_date` <= curdate()))))) `t2` on((`t1`.`name` = `t2`.`name`)))) `t` union all select `t`.`s_name` AS `s_name`,`t`.`s_code` AS `s_code`,`t`.`end_dt` AS `end_dt`,`t`.`prev_dt` AS `prev_dt`,`t`.`end_price` AS `end_price`,`t`.`prev_price` AS `prev_price`,`t`.`rate` AS `rate`,`t`.`back_week` AS `back_week`,row_number() OVER (ORDER BY `t`.`rate` desc )  AS `rn` from (select `t1`.`name` AS `s_name`,`t1`.`code` AS `s_code`,`t1`.`end_dt` AS `end_dt`,`t2`.`prev_dt` AS `prev_dt`,`t1`.`end_price` AS `end_price`,`t2`.`prev_price` AS `prev_price`,((`t1`.`end_price` - `t2`.`prev_price`) / `t1`.`end_price`) AS `rate`,1 AS `back_week` from ((select `tbl_kline`.`name` AS `name`,`tbl_kline`.`code` AS `code`,`tbl_kline`.`trading_date` AS `end_dt`,`tbl_kline`.`closing_price` AS `end_price` from `tbl_kline` where (`tbl_kline`.`trading_date` = (select max(`tbl_kline`.`trading_date`) from `tbl_kline` where ((`tbl_kline`.`trading_date` >= (((curdate() - interval weekday(curdate()) day) - interval 1 week) + interval 4 day)) and (`tbl_kline`.`trading_date` <= curdate()))))) `t1` join (select `tbl_kline`.`name` AS `name`,`tbl_kline`.`code` AS `code`,`tbl_kline`.`trading_date` AS `prev_dt`,`tbl_kline`.`closing_price` AS `prev_price` from `tbl_kline` where (`tbl_kline`.`trading_date` = (select min(`tbl_kline`.`trading_date`) from `tbl_kline` where ((`tbl_kline`.`trading_date` >= (((curdate() - interval weekday(curdate()) day) - interval 1 week) + interval 4 day)) and (`tbl_kline`.`trading_date` <= curdate()))))) `t2` on((`t1`.`name` = `t2`.`name`)))) `t`) `t` join (select max(`stock_rank`.`period`) AS `max_period` from `stock_rank`) `t2`);

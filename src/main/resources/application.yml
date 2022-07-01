@@ -31,6 +31,8 @@ server:
   port: 8084
 mybatis:
   mapper-locations: classpath*:mapper/*.xml
+  configuration:
+    mapUnderscoreToCamelCase: true
 
 
 # 每30分钟执行一次通用数据爬取
