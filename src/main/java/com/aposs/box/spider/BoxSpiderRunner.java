@@ -28,7 +28,7 @@ public class BoxSpiderRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         // 启动程序立刻执行一次爬取程序
-//        stockSpiderService.runKlineSpider(10);
+        stockSpiderService.runKlineSpider(10);
     }
 
     /**
