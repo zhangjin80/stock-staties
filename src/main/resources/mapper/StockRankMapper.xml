@@ -37,7 +37,7 @@
                `end_price`,
                `prev_price`,
                `rate`,
-               `rn` from stock_rank_v
+               `rn` from stock_rank_view
     </insert>
 
 </mapper>

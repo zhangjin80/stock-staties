@@ -1,8 +1,7 @@
 package com.aposs.box.spider;
 
+import com.aposs.box.spider.service.StockRankService;
 import com.aposs.box.spider.service.StockSpiderService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,15 +19,17 @@ import java.time.LocalDate;
 @Component
 public class BoxSpiderRunner implements ApplicationRunner {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
     @Resource
     private StockSpiderService stockSpiderService;
+    @Resource
+    private StockRankService stockRankService;
+
 
     @Override
     public void run(ApplicationArguments args) {
         // 启动程序立刻执行一次爬取程序
-        stockSpiderService.runKlineSpider(10);
+        stockSpiderService.runKlineSpider(30);
+        stockRankService.genRankData();
     }
 
     /**
