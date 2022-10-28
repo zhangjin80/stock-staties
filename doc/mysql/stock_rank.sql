@@ -7,7 +7,7 @@ SELECT `t`.`s_code`                       AS `s_code`,
        `t`.`prev_dt`                      AS `prev_dt`,
        `t`.`end_price`                    AS `end_price`,
        `t`.`prev_price`                   AS `prev_price`,
-       `t`.`rate`                         AS `rate`,
+       round(`t`.`rate`*100,2)            AS `rate`,
        `t`.`rn`                           AS `rn`
 FROM   (
         (
